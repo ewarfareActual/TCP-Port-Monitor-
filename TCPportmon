@@ -1,0 +1,35 @@
+import socket
+
+def monitor_tcp_connections(host, port, output_file):
+    # Create a socket object
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+   
+    # Bind the socket to the host and port
+    server_socket.bind((host, port))
+   
+    # Listen for incoming connections
+    server_socket.listen(1)
+   
+    print(f"Listening on {host}:{port}...")
+   
+    while True:
+        client_socket, client_address = server_socket.accept()
+        print(f"Connection from: {client_address}")
+       
+        with open(output_file, 'a') as f:
+            f.write(f"Connecting IP: {client_address}\n")
+            while True:
+                data = client_socket.recv(1024)
+                if not data:
+                    break
+                f.write(f"Data: {data}\n")
+                print(f"Data received from {client_address}: {data}")
+       
+        client_socket.close()
+   
+if __name__ == "__main__":
+    host = "0.0.0.0"  # Listen on all available network interfaces
+    port = 12345  # Specify the port to listen on
+    output_file = "connection_log.txt"
+   
+    monitor_tcp_connections(host, port, output_file)
